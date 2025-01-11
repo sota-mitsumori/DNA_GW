@@ -20,15 +20,15 @@ int enc(){
 
   for(int i=0; i<ORGDATA_LEN; i+=12){
     
-    for (int j=0;j<2;j++) {
+    for (int j=0;j<1;j++) {
       fputc(BASE_A, efp); // 文字数稼ぎ
     }
-    unsigned char  str[46] = {0};
-    for (int j = 0; j < 16; j++) {
-          str[15 - j] = (i >> j) & 1; // jビット目を取得しリストに格納（MSBがリストの最初になるように逆順）
+    unsigned char  str[48] = {0};
+    for (int j = 0; j < 18; j++) {
+          str[17 - j] = (i >> j) & 1; // jビット目を取得しリストに格納（MSBがリストの最初になるように逆順）
     }
 
-    for (int j = 0; j < 16; j+=2) {
+    for (int j = 0; j < 18; j+=2) {
           switch( ( (str[j] & 0x1) << 7) >> 6 | ( str[j+1] & 0x1) ){
         case 0:
           res = BASE_A;
@@ -47,7 +47,7 @@ int enc(){
     }
 
     
-    for (int j = 16; j < 37; j+=7) {
+    for (int j = 18; j < 39; j+=7) {
       str[j] = getc(ofp);
       str[j+1] = getc(ofp);
       str[j+2] = getc(ofp);

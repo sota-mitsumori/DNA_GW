@@ -33,7 +33,7 @@ int dec(){
   }
 
   unsigned char buffer[25];    
-  int index[16];
+  int index[18];
   int Hamming_1[7];
   int Hamming_2[7];
   int Hamming_3[7];
@@ -53,35 +53,64 @@ int dec(){
         buffer[j] = c;
     }
 
-    for (int i=2;i<10;i++) {
-      char x = buffer[i];
+    // インデックスの読み取りループを修正
+    for (int j = 0; j < 9; j++) {
+      char x = buffer[1 + j];
       switch(x){
         case BASE_A:
-          index[2*(i-2)] = 0;
-          index[2*(i-2)+1] = 0;
-          break;
+            index[2*j] = 0;
+            index[2*j+1] = 0;
+            break;
         case BASE_C:
-          index[2*(i-2)] = 0;
-          index[2*(i-2)+1] = 1;   
-          break;
+            index[2*j] = 0;
+            index[2*j+1] = 1;
+            break;
         case BASE_G:
-          index[2*(i-2)] = 1;
-          index[2*(i-2)+1] = 0;   
-          break;
+            index[2*j] = 1;
+            index[2*j+1] = 0;
+            break;
         case BASE_T:
-          index[2*(i-2)] = 1;
-          index[2*(i-2)+1] = 1;    
-          break;
+            index[2*j] = 1;
+            index[2*j+1] = 1;
+            break;
+        default:
+            fprintf(stderr, "Invalid base '%c' in index encoding.\n", x);
+            fclose(sfp);
+            fclose(dfp);
+            exit(1);
       }
-
     }
+
+
+    // for (int i=1;i<10;i++) {
+    //   char x = buffer[i];
+    //   switch(x){
+    //     case BASE_A:
+    //       index[2*(i-2)] = 0;
+    //       index[2*(i-2)+1] = 0;
+    //       break;
+    //     case BASE_C:
+    //       index[2*(i-2)] = 0;
+    //       index[2*(i-2)+1] = 1;   
+    //       break;
+    //     case BASE_G:
+    //       index[2*(i-2)] = 1;
+    //       index[2*(i-2)+1] = 0;   
+    //       break;
+    //     case BASE_T:
+    //       index[2*(i-2)] = 1;
+    //       index[2*(i-2)+1] = 1;    
+    //       break;
+    //   }
+
+    // }
     int decimal_value = 0;
 
     // 二進数を10進数に変換
-    for (int j = 0; j < 16; j++) {
+    for (int j = 0; j < 18; j++) {
       decimal_value = (decimal_value << 1) | index[j];
     }
-    // for (int  j= 0; j < 16; j++) {
+    // for (int  j= 0; j < 18; j++) {
     //     decimal_value += index[j] * (int)pow(2, 15 - j);
     // }
 
@@ -222,13 +251,23 @@ int dec(){
     int decode_number[12] = {Hamming_1[0],Hamming_1[1],Hamming_1[2],Hamming_1[3],
                             Hamming_2[0],Hamming_2[1],Hamming_2[2],Hamming_2[3],
                             Hamming_3[0],Hamming_3[1],Hamming_3[2],Hamming_3[3]};
-    char str[12];  // 終端文字 \0 を含めて13文字分確保
+    char str[13];  // 終端文字 \0 を含めて13文字分確保
     
     // 配列の各要素を文字 '0' または '1' に変換して str に格納
     for (int j = 0; j < 12; j++) {
         str[j] = decode_number[j] + '0';  // int を '0' と '1' の文字に変換
     }
     str[12] = '\0';
+
+
+    // インデックスを用いてデコードデータを正しい位置に配置
+    // if (decode[result_mod_12][0] == '\0') { // 既にデータが存在しない場合
+    //     strncpy(decode[result_mod_12], str, 12);
+    // } else {
+    //     decode_fail[fail_index].key = result_mod_12;
+    //     strncpy(decode_fail[fail_index].str, str, 12);
+    //     fail_index++;
+    // }
 
 
     if (result_mod_12_ans == 0 && decode[result_mod_12][0] == '\0') {
@@ -241,8 +280,9 @@ int dec(){
       fail_index++;
     }
   }
+
+  //デコード失敗したデータを埋める
   fail_index = 0;
- 
   for (int i = 0; i < list_size; i++) {
       if (decode[i][0] == '\0') { // decodeの空白を発見
         strcpy(decode[i], decode_fail[fail_index].str);
@@ -255,9 +295,9 @@ int dec(){
     for (int j = 0; j < str_size; j++){
       res = decode[i][j];
       //'0'または'1'のみを書き込む
-      if (res != '0' && res != '1') {
-          res = '0'; // デフォルト値を設定（必要に応じて変更）
-      }
+      // if (res != '0' && res != '1') {
+      //     res = '0'; // デフォルト値を設定（必要に応じて変更）
+      // }
       fputc(res, dfp);
     }
   }
