@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "grpwk24.h"
-#define REPEAT 50
+#define REPEAT 100
 
 int enc(){
   FILE *ofp;
