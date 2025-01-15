@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "grpwk24.h"
-#define REPEAT 80
+#define REPEAT 300
 
 int enc(){
   FILE *ofp;
@@ -62,7 +62,6 @@ int enc(){
             fputc(BASE_G, efp);
         }
     }
-    
   }
   res = '\n';
   fputc(res, efp);
